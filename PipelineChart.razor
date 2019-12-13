@@ -1,0 +1,172 @@
+﻿<svg height="@Height" width="@Width">
+
+
+    <path @onclick="ToggleFilterBy" d="@newLeadsPath" fill="red"></path>
+    <path @onclick="ToggleFilterBy" d="@qualifiedPath" fill="orange"></path>
+    <path @onclick="ToggleFilterBy" d="@quoteSentPath" fill="green"></path>
+    <path @onclick="ToggleFilterBy" d="@inProgressPath" fill="blue"></path>
+    <path @onclick="ToggleFilterBy" d="@wonPath" fill="purple"></path>
+
+    @{
+
+
+
+    }
+
+</svg>
+
+
+
+
+@code {
+
+    [Parameter]
+    public int Height { get; set; } = 250;
+
+    [Parameter]
+    public int Width { get; set; } = 250;
+
+
+    [Parameter]
+    public bool FilterOnValue { get; set; } = false;
+
+    [Parameter]
+    public Pipeline Pipeline { get; set; }
+
+    private string newLeadsPath = "";
+    private string qualifiedPath = "";
+    private string quoteSentPath = "";
+    private string inProgressPath = "";
+    private string wonPath = "";
+
+    private int horzUnitSize => Width / 100;
+
+    private int vertUnitSize => Height / 5;
+
+    protected override void OnInitialized()
+    {
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Pipeline != null)
+            GenerateGraph();
+    }
+
+    public void ToggleFilterBy()
+    {
+        FilterOnValue = !FilterOnValue;
+
+        GenerateGraph();
+    }
+
+    private void GenerateGraph()
+    {
+
+        decimal qualifedPercent = FilterOnValue ? Pipeline.QualifiedStageValuePercent : Pipeline.QualifiedStagePercent;
+        decimal quoteSentPercent = FilterOnValue ? Pipeline.QuoteSentStageValuePercent : Pipeline.QuoteSentStagePercent;
+        decimal inProgressPrecent = FilterOnValue ? Pipeline.InProgressStageValuePercent : Pipeline.InProgressStagrPercent;
+        decimal wonPercent = FilterOnValue ? Pipeline.WonStageValuePercent : Pipeline.WonStagePercent;
+
+
+        //Geneate the new leads path
+
+
+
+
+        int p1x = 0;
+        int p1y = 0;
+
+
+
+        int p2x = Width;
+        int p2y = 0;
+
+
+
+
+        int p3x = Width - (int)(((100 - qualifedPercent) / 2) * horzUnitSize);
+        int p3y = vertUnitSize;
+
+
+
+        int p4x = (int)(((100 - qualifedPercent) / 2) * horzUnitSize);
+        int p4y = vertUnitSize;
+
+
+        newLeadsPath = $"M {p1x} {p1y} L {p2x} {p2y} L {p3x} {p3y} L {p4x} {p4y} Z";
+
+
+        p1x = p4x;
+        p2x = p3x;
+
+        p1y = vertUnitSize * 1;
+        p2y = vertUnitSize * 1;
+
+        p3y = vertUnitSize * 2;
+        p4y = vertUnitSize * 2;
+
+        p3x = Width - (int)(((100 - quoteSentPercent) / 2) * horzUnitSize);
+        p4x = (int)((100 - quoteSentPercent) / 2) * horzUnitSize;
+
+
+        qualifiedPath = $"M {p1x} {p1y} L {p2x} {p2y} L {p3x} {p3y} L {p4x} {p4y} Z";
+
+        p1x = p4x;
+        p2x = p3x;
+
+        p1y = vertUnitSize * 2;
+        p2y = vertUnitSize * 2;
+
+        p3y = vertUnitSize * 3;
+        p4y = vertUnitSize * 3;
+
+        p3x = Width - (int)(((100 - inProgressPrecent) / 2) * horzUnitSize);
+        p4x = (int)((100 - inProgressPrecent) / 2) * horzUnitSize;
+
+        quoteSentPath = $"M {p1x} {p1y} L {p2x} {p2y} L {p3x} {p3y} L {p4x} {p4y} Z";
+
+
+        p1x = p4x;
+        p2x = p3x;
+
+        p1y = vertUnitSize * 3;
+        p2y = vertUnitSize * 3;
+
+        p3y = vertUnitSize * 4;
+        p4y = vertUnitSize * 4;
+
+        p3x = Width - (int)(((100 - wonPercent) / 2) * horzUnitSize);
+        p4x = (int)((100 - wonPercent) / 2) * horzUnitSize;
+
+
+        inProgressPath = $"M {p1x} {p1y} L {p2x} {p2y} L {p3x} {p3y} L {p4x} {p4y} Z";
+
+        p1x = p4x;
+        p2x = p3x;
+
+        p1y = vertUnitSize * 4;
+        p2y = vertUnitSize * 4;
+
+        p3y = vertUnitSize * 5;
+        p4y = vertUnitSize * 5;
+
+        // p3x = p2x;
+        // p4x = p1x;
+
+
+        wonPath = $"M {p1x} {p1y} L {p2x} {p2y} L {p3x} {p3y} L {p4x} {p4y} Z";
+
+
+
+        Console.WriteLine(newLeadsPath);
+
+
+    }
+
+
+
+
+
+}
+
