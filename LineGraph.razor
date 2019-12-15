@@ -1,0 +1,179 @@
+﻿@using LineCharts
+
+<div class="svgcontainer">
+    <svg height="@Height" width="@Width">
+        <g>
+            <path d="@GenerateAxisPath()" stroke="lightgrey" stroke-width="1" fill="none" />
+
+        </g>
+        @if (showXGridLines)
+        {
+            <g>
+                @for (int i = 0; i <= SeriesCollection.XUnitCount; i++)
+                {
+                    int x = leftMargin + (i * xUnitSize);
+
+
+                    var path = $"M {x} {0 + topMargin} L {x} {Height - (bottomMargin) + 4}";
+
+                    <path d="@path" stroke="lightsteelblue"></path>
+                }
+            </g>
+        }
+        @if (showYGridLines)
+        {
+            <g>
+                @{
+                    int y = topMargin;
+                    int y2 = topMargin + (maxHeight / 2);
+
+
+                    var path1 = $"M {0 + (leftMargin) - 4} {y} L {Width - rightMargin} {y}";
+
+                    var path2 = $"M {0 + (leftMargin) - 4} {y2} L {Width - rightMargin} {y2}";
+
+                    <path d="@path1" stroke="lightsteelblue"></path>
+                    <path d="@path2" stroke="lightsteelblue"></path>
+
+
+
+                }
+
+
+                @*@for (int i = 0; i <= SeriesCollection.YUnitCount; i++)
+                {
+
+                    int y = topMargin + (i * yUnitSize);
+
+                    var path = $"M {0 + (leftMargin) - 4} {y} L {Width - rightMargin} {y}";
+
+                    <path d="@path" stroke="lightsteelblue"></path>
+                }*@
+            </g>
+        }
+        @if (showAxisLabels)
+        {
+
+            int y1 = Height - 5;
+
+            @for (int i = 0; i <= SeriesCollection.XUnitCount; i++)
+            {
+                var x = (i * xUnitSize) + leftMargin - 10;
+
+                <text>
+                    <text x="@x" y="@y1" style="fill:grey; font-size: small; font-family: Roboto;">
+                        @if (i < SeriesCollection.XLabels.Count)
+                        {
+                            @SeriesCollection.XLabels[i]
+                        }
+                    </text>
+                </text>
+            }
+
+            <text>
+                <text x="0" y="20" style="fill:grey; font-size: small; font-family: Roboto;">@SeriesCollection.MaxValue</text>
+            </text>
+
+            @*@for (int i = 0; i <= XUnitCount; i++)
+                {
+                    var x = (i * xUnitSize) + leftMargin;
+
+                    var y = topMargin + (yUnitSize * (10 - i)) + 5;
+
+
+                    <text>
+                    </text>
+                }*@
+
+        }
+        <g>
+            @foreach (var range in ranges.Items)
+            {
+                if (range.Show)
+                {
+                    <g style="position: relative" data-tool-tip="@range.Name">
+                        <path class="range" d="@range.Path.Value" stroke="@range.Color" stroke-width="2" fill="none"></path>
+                    </g>
+                }
+            }
+        </g>
+    </svg>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public int Height { get; set; }
+
+    [Parameter]
+    public int Width { get; set; }
+
+    [Parameter]
+    public TimeSeriesCollection SeriesCollection { get; set; }
+
+    //[Parameter]
+    //public List<string> XLabels { get; set; } = new List<string>();
+
+    // TODO swap these
+    bool showXGridLines = true;
+    bool showYGridLines = true;
+
+    bool showAxisLabels = true;
+
+    int bottomMargin = 20;
+    int topMargin = 10;
+    int leftMargin = 50;
+    int rightMargin = 15;
+
+    //[Parameter]
+    //public int XUnitCount { get; set; } = 10;
+
+    //[Parameter]
+    //public int YUnitCount { get; set; } = 10;
+
+    //[Parameter]
+    //public decimal MaxValue { get; set; } = 10000;
+
+    int maxHeight => Height - topMargin - bottomMargin;
+    int maxWidth => Width - leftMargin - rightMargin;
+
+    int xUnitSize => maxWidth / SeriesCollection.XUnitCount;
+    int yUnitSize => maxHeight / SeriesCollection.YUnitCount;
+
+    Ranges ranges { get; set; } = new Ranges();
+
+    protected override void OnParametersSet()
+    {
+        if (SeriesCollection != null)
+            RenderRanges();
+    }
+
+    private void RenderRanges()
+    {
+        SeriesCollection.Render(SeriesCollection.MaxValue);
+
+        foreach (var series in SeriesCollection.TimeSeries.Values)
+        {
+            var points = new List<Point>();
+
+            for (int i = 0; i < series.Items.Count(); i++)
+            {
+                points.Add(new Point(leftMargin + (xUnitSize * i), topMargin + (yUnitSize * (SeriesCollection.YUnitCount - series.Items[i].RenderValue))));
+                Console.WriteLine(points.LastOrDefault().ToString());
+
+                //XLabels[]
+
+            }
+
+            ranges.AddRange(new Range(series.Name, series.Color, points));
+        }
+
+    }
+
+    public string GenerateAxisPath()
+    {
+        return $"M {leftMargin} {topMargin} L {leftMargin}  {Height - bottomMargin} L {Width - rightMargin} {Height - bottomMargin}";
+    }
+
+}

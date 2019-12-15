@@ -1,0 +1,26 @@
+﻿@using PieCharts
+
+<div class="c-flex">
+    <svg height="200" width="200">
+        @foreach (var slice in Slices.Items)
+        {
+            <path d="@slice.Command" fill="none" stroke="@slice.Color" stroke-width="15"></path>
+        }
+    </svg>
+    @*<div class="c-flex-200 pie-chart-side">
+        @foreach (var item in Slices.Items)
+        {
+            <div>
+                <div class="legend-item">
+                    <div class="legend-item-marker" style="background-color: @item.Color;"></div>
+                    <p class="legend-item-label"><span class="hl-text">@item.Value</span> @item.Name</p>
+                </div>
+            </div>
+        }
+    </div>*@
+</div>
+
+@code {
+    [Parameter]
+    public Slices Slices { get; set; } = new Slices();
+}
